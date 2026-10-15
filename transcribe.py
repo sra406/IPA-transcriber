@@ -18,8 +18,8 @@ except ImportError as exc:  # pragma: no cover - exercised by CLI users
     raise SystemExit("Missing dependencies. Install them with: python -m pip install -r requirements.txt") from exc
 
 
-# Broad North American/Canadian English values; stress affects rules but is not
-# printed in the IPA output. Unstressed AH is rendered as schwa.
+# Broad North American/Canadian English values; stress affects rules and is
+# shown in the IPA output. Unstressed AH is rendered as schwa.
 CONSONANTS = {
     "B": "b", "CH": "tʃ", "D": "d", "DH": "ð", "F": "f",
     "G": "ɡ", "HH": "h", "JH": "dʒ", "K": "k", "L": "l",
@@ -62,6 +62,13 @@ def _syllable_starts(parsed: list[tuple[str, str]]) -> set[int]:
                 onset_size = size
         starts.add(right - onset_size)
     return starts
+
+
+def _mark_phrase_boundaries(separator: str) -> str:
+    """Convert punctuation in a text gap to phrase boundary markers."""
+    separator = re.sub(r"[,;:]+", "|", separator)
+    separator = re.sub(r"[.!?]+", "‖", separator)
+    return re.sub(r"\n\s*\n", " ‖ ", separator)
 
 
 def _to_ipa(phones: list[str]) -> str:
@@ -212,14 +219,7 @@ def transcribe(
     out: list[str] = ["["]
     cursor = 0
     for match in matches:
-        separator = text[cursor:match.start()]
-        if re.search(r"\n\s*\n", separator):
-            separator = re.sub(r"\n\s*\n", " ‖ ", separator)
-        elif re.search(r"[.!?]", separator):
-            separator = re.sub(r"[.!?]+", "‖", separator)
-        elif re.search(r"[,;:]", separator):
-            separator = re.sub(r"[,;:]+", "|", separator)
-        out.append(separator)
+        out.append(_mark_phrase_boundaries(text[cursor:match.start()]))
         word = match.group(0)
         ipa, source = pronounce(
             word,
@@ -233,12 +233,7 @@ def transcribe(
             ipa = stress_marks + "ʔ" + ipa_body
         out.append(f"{ipa}⟨{source}⟩" if show_sources else ipa)
         cursor = match.end()
-    trailing = text[cursor:]
-    if re.search(r"[.!?]", trailing):
-        trailing = re.sub(r"[.!?]+", "‖", trailing)
-    elif re.search(r"[,;:]", trailing):
-        trailing = re.sub(r"[,;:]+", "|", trailing)
-    out.append(trailing)
+    out.append(_mark_phrase_boundaries(text[cursor:]))
     out.append("]")
     return "".join(out)
 

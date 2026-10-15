@@ -15,6 +15,19 @@ python -m pip install -r requirements.txt
 The Python packages include the CMU Pronouncing Dictionary data and the G2P model.
 The first G2P use may take longer while its model resources initialize.
 
+## Acknowledgments and third-party resources
+
+- **CMU Pronouncing Dictionary (CMUdict):** Maintained by Carnegie Mellon University.
+  This project uses it through the `cmudict` Python package for dictionary lookups.
+  CMU requests acknowledgment when its dictionary is used or redistributed. See the
+  [CMUdict repository and license](https://github.com/cmusphinx/cmudict).
+- **g2p-en:** Grapheme-to-phoneme model by Kyubyong Park and Jongseok Kim, distributed
+  under the Apache License 2.0. See the [upstream project](https://github.com/Kyubyong/g2p)
+  and [PyPI package metadata](https://pypi.org/project/g2p-en/).
+
+These are third-party dependencies installed from PyPI; their source and model files are
+not copied into this repository. Each dependency remains under its own license.
+
 ## Use
 
 ```sh
