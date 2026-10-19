@@ -54,7 +54,8 @@ region (including vowel mergers and raising). The program does not model those d
 or sentence-level reductions, and alternate dictionary pronunciations are not selectable
 yet. Treat unknown-word output as a plausible prediction, not an authoritative pronunciation.
 
-IPA output is broad phonemic transcription with primary and secondary stress marks.
+IPA output is broad phonemic transcription with primary and secondary stress marks placed
+at the beginning of the stressed syllable, before its onset.
 Unstressed `AH` is rendered as schwa, and English `R` is rendered as the North American
 approximant /ɹ/.
 Diphthongs use a non-syllabic mark: /aɪ̯, aʊ̯, ɔɪ̯, əɪ̯, oʊ̯/.

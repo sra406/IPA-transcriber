@@ -92,11 +92,22 @@ def _to_ipa(phones: list[str]) -> str:
         with_hiatus.append(phone)
     parsed = with_hiatus
     syllable_starts = _syllable_starts(parsed)
+    stress_at: dict[int, str] = {}
+    for nucleus, (base, stress) in enumerate(parsed):
+        if base not in VOWELS or stress not in {"1", "2"}:
+            continue
+        onset = max((start for start in syllable_starts if start <= nucleus), default=0)
+        # An inserted glottal stop is the onset of the following hiatus syllable.
+        if onset > 0 and parsed[onset - 1][0] == "ʔ":
+            onset -= 1
+        stress_at[onset] = "ˈ" if stress == "1" else "ˌ"
 
     out: list[str] = []
     for i, (base, stress) in enumerate(parsed):
         if i in syllable_starts:
             out.append(".")
+        if i in stress_at:
+            out.append(stress_at[i])
         if base == "ʔ":
             out.append("ʔ")
             continue
@@ -113,12 +124,6 @@ def _to_ipa(phones: list[str]) -> str:
                 value = value.replace("̯", "̯̃")
             else:
                 value += "̃"
-
-        # Preserve lexical primary and secondary stress from ARPAbet.
-        if is_vowel and stress == "1":
-            out.append("ˈ")
-        elif is_vowel and stress == "2":
-            out.append("ˌ")
 
         # Canadian raising: stressed /aɪ, aʊ/ before a voiceless consonant.
         if stress == "1" and nxt in {"P", "T", "K", "F", "TH", "S", "SH", "CH", "HH"}:
